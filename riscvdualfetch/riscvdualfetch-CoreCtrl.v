@@ -1033,7 +1033,7 @@ module riscv_CoreCtrl
 
   assign stall_Dhl = stall_1_Dhl; 
   wire stall_0_Dhl = (stall_X0hl || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl);
-  wire stall_1_Dhl = (inst0_val_Dhl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl);
+  wire stall_1_Dhl = (inst0_val_Dhl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl || stall_X0hl);
 
   // Next bubble bit
 
