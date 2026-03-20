@@ -167,7 +167,11 @@ module riscv_CoreCtrl
 
   // Stall in F if D is stalled
 
-  assign stall_Fhl = stall_Dhl && !squash_Fhl;
+  assign stall_Fhl = (stall_Dhl || stall_imem_X0hl || stall_imem_Fhl) && !squash_Fhl;
+
+  wire stall_imem_Fhl
+    = ( !reset && imemreq_val_Fhl && inst_val_Fhl && !imemresp0_val && !imemresp0_queue_val_Fhl )
+   || ( !reset && imemreq_val_Fhl && inst_val_Fhl && !imemresp1_val && !imemresp1_queue_val_Fhl );
 
   // Next bubble bit
 
@@ -1032,8 +1036,8 @@ module riscv_CoreCtrl
   // Aggregate Stall Signal
 
   assign stall_Dhl = stall_1_Dhl; 
-  wire stall_0_Dhl = (stall_X0hl || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl);
-  wire stall_1_Dhl = (inst0_val_Dhl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl || stall_X0hl);
+  wire stall_0_Dhl = ((stall_X0hl && inst0_val_Dhl) || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl);
+  wire stall_1_Dhl = (inst0_val_Dhl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl || (stall_X0hl && inst1_val_Dhl));
 
   // Next bubble bit
 
@@ -1233,13 +1237,10 @@ module riscv_CoreCtrl
 
   wire stall_dmem_X1hl
     = ( !reset && dmemreq_val_X1hl && inst_val_X1hl && !dmemresp_val && !dmemresp_queue_val_X1hl );
-  wire stall_imem_X1hl
-    = ( !reset && imemreq_val_Fhl && inst_val_Fhl && !imemresp0_val && !imemresp0_queue_val_Fhl )
-   || ( !reset && imemreq_val_Fhl && inst_val_Fhl && !imemresp1_val && !imemresp1_queue_val_Fhl );
 
   // Aggregate Stall Signal
 
-  assign stall_X1hl = ( stall_imem_X1hl || stall_dmem_X1hl );
+  assign stall_X1hl = ( stall_dmem_X1hl );
 
   // Next bubble bit
 
