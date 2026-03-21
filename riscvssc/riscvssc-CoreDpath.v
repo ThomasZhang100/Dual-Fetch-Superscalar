@@ -28,7 +28,7 @@ module riscv_CoreDpath
 
   // Controls Signals (ctrl->dpath)
 
-  input   [1:0] pc_mux_sel_Phl,
+  input   [2:0] pc_mux_sel_Phl,
   input         steering_mux_sel_Dhl,
   input   [3:0] opA0_byp_mux_sel_Dhl,
   input   [1:0] opA0_mux_sel_Dhl,
@@ -59,7 +59,8 @@ module riscv_CoreDpath
   input         rfB_wen_Whl,
   input  [ 4:0] rfB_waddr_Whl,
   input         stall_Fhl,
-  input         stall_Dhl,
+  input         stall_0_Dhl,
+  input         stall_1_Dhl,
   input         stall_X0hl,
   input         stall_X1hl,
   input         stall_X2hl,
@@ -84,6 +85,7 @@ module riscv_CoreDpath
   // PC mux
 
   wire [31:0] pc_plus8_Phl;
+  wire [31:0] pc_plus4_Phl;
   wire [31:0] branch_targ_Phl;
   wire [31:0] jump_targ_Phl;
   wire [31:0] jumpreg_targ_Phl;
@@ -94,15 +96,17 @@ module riscv_CoreDpath
   // Pull mux inputs from later stages
 
   assign pc_plus8_Phl       = pc_plus8_Fhl;
+  assign pc_plus4_Phl       = pc_plus4_Fhl;
   assign branch_targ_Phl    = branch_targ_X0hl;
   assign jump_targ_Phl      = jump_targ_Dhl;
   assign jumpreg_targ_Phl   = jumpreg_targ_Dhl;
 
   assign pc_mux_out_Phl
-    = ( pc_mux_sel_Phl == 2'd0 ) ? pc_plus8_Phl
-    : ( pc_mux_sel_Phl == 2'd1 ) ? branch_targ_Phl
-    : ( pc_mux_sel_Phl == 2'd2 ) ? jump_targ_Phl
-    : ( pc_mux_sel_Phl == 2'd3 ) ? jumpreg_targ_Phl
+    = ( pc_mux_sel_Phl == 3'd0 ) ? pc_plus8_Phl
+    : ( pc_mux_sel_Phl == 3'd1 ) ? branch_targ_Phl
+    : ( pc_mux_sel_Phl == 3'd2 ) ? jump_targ_Phl
+    : ( pc_mux_sel_Phl == 3'd3 ) ? jumpreg_targ_Phl
+    : ( pc_mux_sel_Phl == 3'd4 ) ? pc_plus4_Phl
     :                              32'bx;
 
   // Send out imem request early
@@ -150,10 +154,15 @@ module riscv_CoreDpath
   reg [31:0] pc_plus8_Dhl;
 
   always @ (posedge clk) begin
-    if( !stall_Dhl ) begin
+    if( !stall_0_Dhl && !stall_1_Dhl ) begin
       pc_Dhl       <= pc_Fhl;
       pc_plus4_Dhl <= pc_plus4_Fhl;
       pc_plus8_Dhl <= pc_plus8_Fhl;
+    end
+    else if( !stall_0_Dhl && stall_1_Dhl ) begin
+      pc_Dhl       <= pc_plus4_Dhl;
+      pc_plus4_Dhl <= pc_Fhl;
+      pc_plus8_Dhl <= pc_plus4_Fhl;
     end
   end
 

@@ -65,7 +65,7 @@ module riscv_Core
   wire [31:0] dmemreq_msg_data;
   wire [31:0] dmemresp_msg_data;
 
-  wire  [1:0] pc_mux_sel_Phl;
+  wire  [2:0] pc_mux_sel_Phl;
   wire        steering_mux_sel_Dhl;
   wire  [3:0] opA0_byp_mux_sel_Dhl;
   wire  [1:0] opA0_mux_sel_Dhl;
@@ -96,7 +96,8 @@ module riscv_Core
   wire        rfB_wen_Whl;
   wire  [4:0] rfB_waddr_Whl;
   wire        stall_Fhl;
-  wire        stall_Dhl;
+  wire        stall_0_Dhl;
+  wire        stall_1_Dhl;
   wire        stall_X0hl;
   wire        stall_X1hl;
   wire        stall_X2hl;
@@ -234,7 +235,8 @@ module riscv_Core
     .rfB_wen_out_Whl         (rfB_wen_Whl),
     .rfB_waddr_Whl           (rfB_waddr_Whl),
     .stall_Fhl               (stall_Fhl),
-    .stall_Dhl               (stall_Dhl),
+    .stall_0_Dhl             (stall_0_Dhl),
+    .stall_1_Dhl             (stall_1_Dhl),
     .stall_X0hl              (stall_X0hl),
     .stall_X1hl              (stall_X1hl),
     .stall_X2hl              (stall_X2hl),
@@ -309,7 +311,8 @@ module riscv_Core
     .rfB_wen_Whl              (rfB_wen_Whl),
     .rfB_waddr_Whl            (rfB_waddr_Whl),
     .stall_Fhl                (stall_Fhl),
-    .stall_Dhl                (stall_Dhl),
+    .stall_0_Dhl              (stall_0_Dhl),
+    .stall_1_Dhl              (stall_1_Dhl),
     .stall_X0hl               (stall_X0hl),
     .stall_X1hl               (stall_X1hl),
     .stall_X2hl               (stall_X2hl),
